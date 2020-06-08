@@ -6,26 +6,30 @@
 //  Copyright © 2017 SwifterSwift
 //
 
-#if os(iOS)
-
 import XCTest
 @testable import SwifterSwift
 
+#if canImport(UIKit) && os(iOS)
+import UIKit
+
 final class UIDatePickerExtensionsTests: XCTestCase {
-	
-	func testTextColor() {
-		let datePicker = UIDatePicker()
-		XCTAssertNil(datePicker.textColor)
-		
-		datePicker.textColor = .red
-		XCTAssertEqual(datePicker.textColor, .red)
-		
-		datePicker.textColor = .green
-		XCTAssertEqual(datePicker.textColor, .green)
-		
-		datePicker.textColor = nil
-		XCTAssertNil(datePicker.textColor)
-	}
-	
+
+    func testTextColor() {
+        let datePicker = UIDatePicker()
+        if let color = datePicker.textColor {
+            XCTAssertNotEqual(color, .red)
+        }
+
+        datePicker.textColor = .red
+        XCTAssertEqual(datePicker.textColor, .red)
+
+        datePicker.textColor = .green
+        XCTAssertEqual(datePicker.textColor, .green)
+
+        datePicker.textColor = nil
+        XCTAssertNil(datePicker.textColor)
+    }
+
 }
+
 #endif
