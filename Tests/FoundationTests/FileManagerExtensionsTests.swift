@@ -1,19 +1,12 @@
-//
-//  FileManagerExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Jason Jon E. Carreos on 05/02/2018.
-//  Copyright © 2018 SwifterSwift
-//
+// FileManagerExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if canImport(Foundation)
 import Foundation
 
 final class FileManagerExtensionsTests: XCTestCase {
-
     func testJSONFromFileAtPath() {
         #if !os(Linux)
         do {
@@ -32,8 +25,8 @@ final class FileManagerExtensionsTests: XCTestCase {
             // Check contents
             if let dict = json {
                 if let string = dict["title"] as? String, let itemId = dict["id"] as? Int {
-                    XCTAssert(string == "Test")
-                    XCTAssert(itemId == 1)
+                    XCTAssertEqual(string, "Test")
+                    XCTAssertEqual(itemId, 1)
                 } else {
                     XCTFail("Does not contain the correct content.")
                 }
@@ -49,12 +42,12 @@ final class FileManagerExtensionsTests: XCTestCase {
     func testJSONFromFileWithFilename() {
         #if !os(Linux)
         do {
-            var filename = "test.json"  // With extension
+            var filename = "test.json" // With extension
             var json = try FileManager.default.jsonFromFile(withFilename: filename, at: FileManagerExtensionsTests.self)
 
             XCTAssertNotNil(json)
 
-            filename = "test"  // Without extension
+            filename = "test" // Without extension
             json = try FileManager.default.jsonFromFile(withFilename: filename, at: FileManagerExtensionsTests.self)
 
             XCTAssertNotNil(json)
@@ -62,8 +55,8 @@ final class FileManagerExtensionsTests: XCTestCase {
             // Check contents
             if let dict = json {
                 if let string = dict["title"] as? String, let itemId = dict["id"] as? Int {
-                    XCTAssert(string == "Test")
-                    XCTAssert(itemId == 1)
+                    XCTAssertEqual(string, "Test")
+                    XCTAssertEqual(itemId, 1)
                 } else {
                     XCTFail("Does not contain the correct content.")
                 }
@@ -86,28 +79,23 @@ final class FileManagerExtensionsTests: XCTestCase {
         #endif
     }
 
-    func testCreateTemporaryDirectory() {
-        do {
-            let fileManager = FileManager.default
-            let tempDirectory = try fileManager.createTemporaryDirectory()
-            XCTAssertFalse(tempDirectory.path.isEmpty)
+    func testCreateTemporaryDirectory() throws {
+        let fileManager = FileManager.default
+        let tempDirectory = try fileManager.createTemporaryDirectory()
+        XCTAssertFalse(tempDirectory.path.isEmpty)
 
-            var isDirectory = ObjCBool(false)
-            XCTAssert(fileManager.fileExists(atPath: tempDirectory.path, isDirectory: &isDirectory))
-            XCTAssertTrue(isDirectory.boolValue)
-            XCTAssert(try fileManager.contentsOfDirectory(atPath: tempDirectory.path).isEmpty)
+        var isDirectory = ObjCBool(false)
+        XCTAssert(fileManager.fileExists(atPath: tempDirectory.path, isDirectory: &isDirectory))
+        XCTAssertTrue(isDirectory.boolValue)
+        XCTAssert(try fileManager.contentsOfDirectory(atPath: tempDirectory.path).isEmpty)
 
-            let tempFile = tempDirectory.appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString)
-            XCTAssert(fileManager.createFile(atPath: tempFile.path, contents: Data(), attributes: nil))
-            XCTAssertFalse(try fileManager.contentsOfDirectory(atPath: tempDirectory.path).isEmpty)
-            XCTAssertNotNil(fileManager.contents(atPath: tempFile.path))
+        let tempFile = tempDirectory.appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString)
+        XCTAssert(fileManager.createFile(atPath: tempFile.path, contents: Data(), attributes: nil))
+        XCTAssertFalse(try fileManager.contentsOfDirectory(atPath: tempDirectory.path).isEmpty)
+        XCTAssertNotNil(fileManager.contents(atPath: tempFile.path))
 
-            try fileManager.removeItem(at: tempDirectory)
-        } catch {
-            XCTFail("\(error)")
-        }
+        try fileManager.removeItem(at: tempDirectory)
     }
-
 }
 
 #endif

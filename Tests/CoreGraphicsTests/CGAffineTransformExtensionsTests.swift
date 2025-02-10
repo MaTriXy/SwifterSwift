@@ -1,24 +1,15 @@
-//
-//  CGAffineTransformExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Guy Kogus on 19/3/20.
-//  Copyright © 2020 SwifterSwift
-//
+// CGAffineTransformExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if canImport(CoreGraphics)
 import CoreGraphics
 
-#if canImport(QuartzCore)
+#if canImport(QuartzCore) && !os(watchOS)
 import QuartzCore
-#endif
 
 final class CGAffineTransformExtensionsTests: XCTestCase {
-
-    #if canImport(QuartzCore)
     func testTransform3D() {
         XCTAssertEqual(CGAffineTransform.identity.transform3D(), CATransform3DIdentity)
 
@@ -30,8 +21,8 @@ final class CGAffineTransformExtensionsTests: XCTestCase {
         XCTAssertEqual(CGAffineTransform(scaleX: x, y: y).transform3D(), CATransform3DMakeScale(x, y, 1))
         XCTAssertEqual(CGAffineTransform(rotationAngle: angle).transform3D(), CATransform3DMakeRotation(angle, 0, 0, 1))
     }
-    #endif
-
 }
+
+#endif
 
 #endif

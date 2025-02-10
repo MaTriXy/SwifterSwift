@@ -1,22 +1,16 @@
-//
-//  WKWebViewExtensions.swift
-//  SwifterSwift
-//
-//  Created by Tigran Hambardzumyan on 5/23/20.
-//  Copyright © 2020 SwifterSwift
-//
+// WKWebViewExtensions.swift - Copyright 2025 SwifterSwift
 
 #if canImport(WebKit)
 import WebKit
 
 // MARK: - Methods
-extension WKWebView {
 
+public extension WKWebView {
     /// SwifterSwift: Navigate to `url`.
     /// - Parameter url: URL to navigate.
     /// - Returns: A new navigation for given `url`.
     @discardableResult
-    public func loadURL(_ url: URL) -> WKNavigation? {
+    func loadURL(_ url: URL) -> WKNavigation? {
         return load(URLRequest(url: url))
     }
 
@@ -24,11 +18,14 @@ extension WKWebView {
     /// - Parameter urlString: The string specifying the URL to navigate to.
     /// - Returns: A new navigation for given `urlString`.
     @discardableResult
-    public func loadURLString(_ urlString: String) -> WKNavigation? {
+    func loadURLString(_ urlString: String, timeout: TimeInterval? = nil) -> WKNavigation? {
         guard let url = URL(string: urlString) else { return nil }
-        return load(URLRequest(url: url))
+        var request = URLRequest(url: url)
+        if let timeout {
+            request.timeoutInterval = timeout
+        }
+        return load(request)
     }
-
 }
 
 #endif

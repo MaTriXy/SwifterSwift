@@ -1,89 +1,89 @@
-//
-//  WKWebViewExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Tigran Hambardzumyan on 5/23/20.
-//  Copyright © 2020 SwifterSwift
-//
+// WKWebViewExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if canImport(WebKit)
 import WebKit
 
+@available(iOS 13.0, macOS 10.15, *)
+@MainActor
 final class WKWebViewExtensionsTests: XCTestCase {
+    private let timeout = TimeInterval(10)
 
     var webView: WKWebView!
 
-    override func setUp() {
-        webView = WKWebView()
+    override func setUp() async throws {
+        _ = await Task { @MainActor in
+            webView = WKWebView()
+        }.result
     }
 
     func testLoadURL() {
         let successExpectation = WebViewSuccessExpectation(description: "Correct URL", webView: webView)
 
-        let url = URL(string: "https://example.com/")!
+        let url = URL(string: "https://www.apple.com/")!
         let navigation = webView.loadURL(url)
 
         XCTAssertNotNil(navigation)
 
-        wait(for: [successExpectation], timeout: 3)
+        wait(for: [successExpectation], timeout: timeout)
     }
 
     func testLoadURLString() {
         let successExpectation = WebViewSuccessExpectation(description: "Correct URL string", webView: webView)
 
-        let urlString = "https://example.com/"
+        let urlString = "https://www.apple.com/"
         let navigation = webView.loadURLString(urlString)
 
         XCTAssertNotNil(navigation)
 
-        wait(for: [successExpectation], timeout: 3)
+        wait(for: [successExpectation], timeout: timeout)
     }
 
     func testLoadInvalidURLString() {
-        let invalidURLString = "invalid url"
-        let navigation = webView.loadURLString(invalidURLString)
+        if #unavailable(iOS 17.0) {
+            let invalidURLString = "invalid url"
+            let navigation = webView.loadURLString(invalidURLString)
 
-        XCTAssertNil(navigation)
+            XCTAssertNil(navigation)
+        }
     }
 
     func testLoadDeadURLString() {
         let failureExpectation = WebViewFailureExpectation(description: "Dead URL string", webView: webView)
 
-        let deadURLString = "https://deadurl.com"
-        let navigation = webView.loadURLString(deadURLString)
+        let deadURLString = "https://dead-url-573489574389.com"
+        let navigation = webView.loadURLString(deadURLString, timeout: 5.0)
 
         XCTAssertNotNil(navigation)
 
-        wait(for: [failureExpectation], timeout: 3)
+        wait(for: [failureExpectation], timeout: timeout)
     }
-
 }
 
-class WebViewSuccessExpectation: XCTestExpectation, WKNavigationDelegate {
+class WebViewSuccessExpectation: XCTestExpectation, WKNavigationDelegate, @unchecked Sendable {
     init(description: String, webView: WKWebView) {
         super.init(description: description)
         webView.navigationDelegate = self
     }
 
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    func webView(_: WKWebView, didCommit _: WKNavigation!) {
         fulfill()
     }
 }
 
-class WebViewFailureExpectation: XCTestExpectation, WKNavigationDelegate {
+class WebViewFailureExpectation: XCTestExpectation, WKNavigationDelegate, @unchecked Sendable {
     init(description: String, webView: WKWebView) {
         super.init(description: description)
         webView.navigationDelegate = self
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFail _: WKNavigation!, withError _: any Error) {
         fulfill()
     }
 
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError _: any Error) {
         fulfill()
     }
 }

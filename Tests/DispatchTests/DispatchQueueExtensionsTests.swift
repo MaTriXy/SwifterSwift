@@ -1,25 +1,20 @@
-//
-//  DispatchQueueExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Quentin Jin on 2018/10/13.
-//  Copyright © 2018 SwifterSwift
-//
+// DispatchQueueExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if canImport(Dispatch)
 import Dispatch
 
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
 final class DispatchQueueExtensionsTests: XCTestCase {
-
-    func testIsMainQueue() {
+    #if !os(Linux)
+    func testIsMainQueue() async {
         let expect = expectation(description: "isMainQueue")
         let group = DispatchGroup()
 
         DispatchQueue.main.async(group: group) {
-            XCTAssertTrue(DispatchQueue.isMainQueue)
+            XCTAssert(DispatchQueue.isMainQueue)
         }
         DispatchQueue.global().async(group: group) {
             XCTAssertFalse(DispatchQueue.isMainQueue)
@@ -29,19 +24,20 @@ final class DispatchQueueExtensionsTests: XCTestCase {
             expect.fulfill()
         }
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        await fulfillment(of: [expect], timeout: 0.5)
     }
+    #endif
 
-    func testIsCurrent() {
+    func testIsCurrent() async {
         let expect = expectation(description: "isCurrent")
         let group = DispatchGroup()
         let queue = DispatchQueue.global()
 
         queue.async(group: group) {
-            XCTAssertTrue(DispatchQueue.isCurrent(queue))
+            XCTAssert(DispatchQueue.isCurrent(queue))
         }
         DispatchQueue.main.async(group: group) {
-            XCTAssertTrue(DispatchQueue.isCurrent(DispatchQueue.main))
+            XCTAssert(DispatchQueue.isCurrent(DispatchQueue.main))
             XCTAssertFalse(DispatchQueue.isCurrent(queue))
         }
 
@@ -49,23 +45,46 @@ final class DispatchQueueExtensionsTests: XCTestCase {
             expect.fulfill()
         }
 
-        waitForExpectations(timeout: 0.5, handler: nil)
-    }
-    
-    func testAsyncAfter() {
-        let delay: Double = 2
-        var codeExecuted = false
-        let codeShouldBeExecuted = expectation(description: "Executed")
-        
-        DispatchQueue.main.asyncAfter(delay: delay) {
-            codeExecuted = true
-            codeShouldBeExecuted.fulfill()
-        }
-        
-        waitForExpectations(timeout: delay, handler: nil)
-        XCTAssert(codeExecuted)
+        await fulfillment(of: [expect], timeout: 0.5)
     }
 
+    func testAsyncAfter() async {
+        let delay = TimeInterval(2)
+        let codeShouldBeExecuted = expectation(description: "Executed")
+
+        DispatchQueue.main.asyncAfter(delay: delay) {
+            codeShouldBeExecuted.fulfill()
+        }
+
+        await fulfillment(of: [codeShouldBeExecuted], timeout: delay + 1)
+    }
+
+    #if !os(Linux)
+    @available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *)
+    func testDebounce() async {
+        var value = 0
+        let done = expectation(description: "Execute block after delay")
+
+        let delay = 0.02
+        let debouncedIncrementor = DispatchQueue.main.debounce(delay: delay) {
+            value += 1
+        }
+
+        for _ in 1...10 {
+            debouncedIncrementor()
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            done.fulfill()
+        }
+
+        XCTAssertEqual(value, 0, "Debounced function was executed right away")
+
+        await fulfillment(of: [done], timeout: 2.5)
+
+        XCTAssertEqual(value, 1, "Value was incremented more once")
+    }
+    #endif
 }
 
 #endif

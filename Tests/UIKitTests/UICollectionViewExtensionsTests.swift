@@ -1,21 +1,16 @@
-//
-//  UICollectionViewExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Omar Albeik on 2/24/17.
-//  Copyright © 2017 SwifterSwift
-//
+// UICollectionViewExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-final private class TestCell: UICollectionViewCell {}
+private final class TestCell: UICollectionViewCell {}
 
+@available(iOS 13.0, tvOS 13.0, *)
+@MainActor
 final class UICollectionViewExtensionsTests: XCTestCase {
-
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     let emptyCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     let flowLayoutCollectionView: UICollectionView = {
@@ -24,26 +19,27 @@ final class UICollectionViewExtensionsTests: XCTestCase {
         layout.itemSize = CGSize(width: 10, height: 10)
         layout.minimumInteritemSpacing = 0
         layout.sectionInset = .zero
-        let collection = UICollectionView(frame: CGRect(x: 0, y: 0, width: 10, height: 15), collectionViewLayout: layout)
-        if #available(iOS 11, *) {
-            collection.insetsLayoutMarginsFromSafeArea = false
-        }
+        let collection = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 10, height: 15),
+            collectionViewLayout: layout)
+        collection.insetsLayoutMarginsFromSafeArea = false
         collection.contentInset = .zero
         return collection
     }()
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        _ = await Task { @MainActor in
+            super.setUp()
 
-        collectionView.dataSource = self
-        collectionView.reloadData()
+            collectionView.dataSource = self
+            collectionView.reloadData()
 
-        emptyCollectionView.dataSource = self
-        emptyCollectionView.reloadData()
+            emptyCollectionView.dataSource = self
+            emptyCollectionView.reloadData()
 
-        flowLayoutCollectionView.dataSource = self
-        flowLayoutCollectionView.reloadData()
-
+            flowLayoutCollectionView.dataSource = self
+            flowLayoutCollectionView.reloadData()
+        }.result
     }
 
     func testIndexPathForLastRow() {
@@ -103,7 +99,10 @@ final class UICollectionViewExtensionsTests: XCTestCase {
 
         let validIndexPathBottom = IndexPath(row: 4, section: 0)
 
-        let bottomOffset = CGPoint(x: 0, y: flowLayoutCollectionView.collectionViewLayout.collectionViewContentSize.height - flowLayoutCollectionView.bounds.size.height)
+        let bottomOffset = CGPoint(
+            x: 0,
+            y: flowLayoutCollectionView.collectionViewLayout.collectionViewContentSize.height - flowLayoutCollectionView
+                .bounds.size.height)
 
         flowLayoutCollectionView.contentOffset = CGPoint(x: 0, y: 30)
         XCTAssertNotEqual(flowLayoutCollectionView.contentOffset, bottomOffset)
@@ -133,26 +132,26 @@ final class UICollectionViewExtensionsTests: XCTestCase {
         XCTAssertFalse(emptyCollectionView.isValidIndexPath(zeroIndexPath))
 
         XCTAssertFalse(collectionView.isValidIndexPath(negativeIndexPath))
-        XCTAssertTrue(collectionView.isValidIndexPath(zeroIndexPath))
-        XCTAssertTrue(collectionView.isValidIndexPath(validIndexPath))
+        XCTAssert(collectionView.isValidIndexPath(zeroIndexPath))
+        XCTAssert(collectionView.isValidIndexPath(validIndexPath))
         XCTAssertFalse(collectionView.isValidIndexPath(invalidIndexPath))
     }
 }
 
+@available(iOS 13.0, tvOS 13.0, *)
 extension UICollectionViewExtensionsTests: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return (collectionView == self.collectionView || collectionView == self.flowLayoutCollectionView) ? 2 : 0
+        return (collectionView == self.collectionView || collectionView == flowLayoutCollectionView) ? 2 : 0
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return (collectionView == self.collectionView || collectionView == self.flowLayoutCollectionView) ? (section == 0 ? 5 : 0) : 0
+        return (collectionView == self.collectionView || collectionView == flowLayoutCollectionView) ?
+            (section == 0 ? 5 : 0) : 0
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_: UICollectionView, cellForItemAt _: IndexPath) -> UICollectionViewCell {
         return UICollectionViewCell()
     }
-
 }
 
 #endif

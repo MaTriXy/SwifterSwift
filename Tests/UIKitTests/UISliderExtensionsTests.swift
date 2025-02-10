@@ -1,19 +1,13 @@
-//
-//  UISliderExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Steven on 2/16/17.
-//  Copyright © 2017 SwifterSwift
-//
+// UISliderExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if os(iOS)
 import UIKit
 
+@MainActor
 final class UISliderExtensionsTests: XCTestCase {
-
     func testCompletionCalledAnimated() {
         let slider = UISlider()
         slider.minimumValue = 0
@@ -23,7 +17,7 @@ final class UISliderExtensionsTests: XCTestCase {
             XCTAssertEqual(slider.value, 90.0)
             exp.fulfill()
         }
-        waitForExpectations(timeout: 5, handler: nil)
+        waitForExpectations(timeout: 5)
     }
 
     func testSetValue() {
@@ -50,9 +44,8 @@ final class UISliderExtensionsTests: XCTestCase {
             exp.fulfill()
         }
         XCTAssertEqual(slider.value, 50.0)
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations(timeout: 3)
     }
-
 }
 
 #endif

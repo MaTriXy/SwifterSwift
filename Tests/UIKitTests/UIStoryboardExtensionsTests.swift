@@ -1,19 +1,13 @@
-//
-//  UIStoryboardExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Steven on 2/25/17.
-//  Copyright © 2017 SwifterSwift
-//
+// UIStoryboardExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if os(iOS)
 import UIKit
 
+@MainActor
 final class UIStoryboardExtensionsTests: XCTestCase {
-
     func testMainStoryboard() {
         XCTAssertNil(UIStoryboard.main)
     }
@@ -23,7 +17,6 @@ final class UIStoryboardExtensionsTests: XCTestCase {
         let viewController = storyboard.instantiateViewController(withClass: UIViewController.self)
         XCTAssertNotNil(viewController)
     }
-
 }
 
 #endif

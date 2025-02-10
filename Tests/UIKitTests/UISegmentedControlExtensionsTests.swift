@@ -1,19 +1,13 @@
-//
-//  UISegmentedControlExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Steven on 2/15/17.
-//  Copyright © 2017 SwifterSwift
-//
+// UISegmentedControlExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
+@MainActor
 final class UISegmentedControlExtensionsTests: XCTestCase {
-
     func testSegmentTitles() {
         let segmentControl = UISegmentedControl()
         XCTAssert(segmentControl.segmentTitles.isEmpty)
@@ -29,7 +23,6 @@ final class UISegmentedControlExtensionsTests: XCTestCase {
         segmentControl.segmentImages = images
         XCTAssertEqual(segmentControl.segmentImages, images)
     }
-
 }
 
 #endif

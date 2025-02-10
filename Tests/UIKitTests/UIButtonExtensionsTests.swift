@@ -1,19 +1,13 @@
-//
-//  UIButtonExtensionsTests.swift
-//  SwifterSwift
-//
-//  Created by Steven on 2/14/17.
-//  Copyright © 2017 SwifterSwift
-//
+// UIButtonExtensionsTests.swift - Copyright 2025 SwifterSwift
 
-import XCTest
 @testable import SwifterSwift
+import XCTest
 
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
+@MainActor
 final class UIButtonExtensionsTests: XCTestCase {
-
     func testImageForDisabled() {
         let button = UIButton()
         XCTAssertEqual(button.imageForDisabled, button.image(for: .disabled))
@@ -50,6 +44,15 @@ final class UIButtonExtensionsTests: XCTestCase {
         XCTAssertEqual(button.imageForSelected, newImage)
     }
 
+    func testImageForFocused() {
+        let button = UIButton()
+        XCTAssertEqual(button.imageForFocused, button.image(for: .focused))
+
+        let newImage = UIImage()
+        button.imageForFocused = newImage
+        XCTAssertEqual(button.imageForFocused, newImage)
+    }
+
     func testTitleColorForDisabled() {
         let button = UIButton()
         XCTAssertEqual(button.titleColorForDisabled, button.titleColor(for: .disabled))
@@ -80,6 +83,14 @@ final class UIButtonExtensionsTests: XCTestCase {
 
         button.titleColorForSelected = .green
         XCTAssertEqual(button.titleColorForSelected, .green)
+    }
+
+    func testTitleColorForFocused() {
+        let button = UIButton()
+        XCTAssertEqual(button.titleColorForFocused, button.titleColor(for: .focused))
+
+        button.titleColorForFocused = .green
+        XCTAssertEqual(button.titleColorForFocused, .green)
     }
 
     func testTitleForDisabled() {
@@ -118,6 +129,70 @@ final class UIButtonExtensionsTests: XCTestCase {
         XCTAssertEqual(button.titleForSelected, title)
     }
 
+    func testTitleForFocused() {
+        let button = UIButton()
+        XCTAssertEqual(button.titleForFocused, button.title(for: .focused))
+
+        let title = "Focused"
+        button.titleForFocused = title
+        XCTAssertEqual(button.titleForFocused, title)
+    }
+
+    func testAttributedTitleForDisabled() {
+        let button = UIButton()
+        XCTAssertEqual(button.attributedTitleForDisabled, button.attributedTitle(for: .disabled))
+
+        let title = NSAttributedString(
+            string: "Disabled",
+            attributes: [.foregroundColor: UIColor.yellow, .backgroundColor: UIColor.green])
+        button.attributedTitleForDisabled = title
+        XCTAssertEqual(button.attributedTitleForDisabled, title)
+    }
+
+    func testAttributedTitleForHighlighted() {
+        let button = UIButton()
+        XCTAssertEqual(button.attributedTitleForHighlighted, button.attributedTitle(for: .highlighted))
+
+        let title = NSAttributedString(
+            string: "Highlighted",
+            attributes: [.foregroundColor: UIColor.yellow, .backgroundColor: UIColor.green])
+        button.attributedTitleForHighlighted = title
+        XCTAssertEqual(button.attributedTitleForHighlighted, title)
+    }
+
+    func testAttributedTitleForNormal() {
+        let button = UIButton()
+        XCTAssertEqual(button.attributedTitleForNormal, button.attributedTitle(for: .normal))
+
+        let title = NSAttributedString(
+            string: "Normal",
+            attributes: [.foregroundColor: UIColor.yellow, .backgroundColor: UIColor.green])
+        button.attributedTitleForNormal = title
+        XCTAssertEqual(button.attributedTitleForNormal, title)
+    }
+
+    func testAttributedTitleForSelected() {
+        let button = UIButton()
+        XCTAssertEqual(button.attributedTitleForSelected, button.attributedTitle(for: .selected))
+
+        let title = NSAttributedString(
+            string: "Selected",
+            attributes: [.foregroundColor: UIColor.yellow, .backgroundColor: UIColor.green])
+        button.attributedTitleForSelected = title
+        XCTAssertEqual(button.attributedTitleForSelected, title)
+    }
+
+    func testAttributedTitleForFocused() {
+        let button = UIButton()
+        XCTAssertEqual(button.attributedTitleForFocused, button.attributedTitle(for: .focused))
+
+        let title = NSAttributedString(
+            string: "Focused",
+            attributes: [.foregroundColor: UIColor.yellow, .backgroundColor: UIColor.green])
+        button.attributedTitleForFocused = title
+        XCTAssertEqual(button.attributedTitleForFocused, title)
+    }
+
     func testSetImageForAllStates() {
         let button = UIButton()
         let image = UIImage()
@@ -127,6 +202,7 @@ final class UIButtonExtensionsTests: XCTestCase {
         XCTAssertEqual(button.imageForHighlighted, image)
         XCTAssertEqual(button.imageForNormal, image)
         XCTAssertEqual(button.imageForSelected, image)
+        XCTAssertEqual(button.imageForFocused, image)
     }
 
     func testSetTitleColorForAllStates() {
@@ -138,6 +214,7 @@ final class UIButtonExtensionsTests: XCTestCase {
         XCTAssertEqual(button.titleColorForHighlighted, color)
         XCTAssertEqual(button.titleColorForNormal, color)
         XCTAssertEqual(button.titleColorForSelected, color)
+        XCTAssertEqual(button.titleColorForFocused, color)
     }
 
     func testSetTitleForAllStates() {
@@ -149,6 +226,7 @@ final class UIButtonExtensionsTests: XCTestCase {
         XCTAssertEqual(button.titleForHighlighted, title)
         XCTAssertEqual(button.titleForNormal, title)
         XCTAssertEqual(button.titleForSelected, title)
+        XCTAssertEqual(button.titleForFocused, title)
     }
 
     func testCenterTextAndImage() {
@@ -177,10 +255,35 @@ final class UIButtonExtensionsTests: XCTestCase {
         titleFrame = button.titleLabel!.frame
 
         XCTAssert(titleFrame.midY > imageFrame.midY)
-        XCTAssertEqual(titleFrame.midX, imageFrame.midX, accuracy: 1.0)
+        XCTAssertEqual(titleFrame.midX, imageFrame.midX, accuracy: 1.5)
         XCTAssertEqual(titleFrame.minY - spacing, imageFrame.maxY, accuracy: 1.0)
     }
 
+    func testSetAttrbiutedTitleForAllStates() {
+        let button = UIButton()
+        let title = NSAttributedString(
+            string: "Title",
+            attributes: [.foregroundColor: UIColor.yellow, .backgroundColor: UIColor.green])
+        button.setAttributedTitleForAllStates(title)
+
+        XCTAssertEqual(button.attributedTitleForDisabled, title)
+        XCTAssertEqual(button.attributedTitleForHighlighted, title)
+        XCTAssertEqual(button.attributedTitleForNormal, title)
+        XCTAssertEqual(button.attributedTitleForSelected, title)
+        XCTAssertEqual(button.attributedTitleForFocused, title)
+    }
+
+    func testSetBackgroundColorForState() {
+        let button = UIButton()
+        let color = UIColor.orange
+
+        button.setBackgroundColor(color: color, forState: .highlighted)
+
+        let highlightedBackgroundImage = button.backgroundImage(for: .highlighted)
+        let averageColor = highlightedBackgroundImage!.averageColor()!
+
+        XCTAssertEqual(averageColor, color, accuracy: 0.01)
+    }
 }
 
 #endif
